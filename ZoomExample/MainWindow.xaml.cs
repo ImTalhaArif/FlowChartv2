@@ -1,11 +1,14 @@
 ﻿using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Shapes;
 using SharpVectors;
 using SharpVectors.Converters;
+using Syncfusion.UI.Xaml.Diagram;
 
 namespace ZoomExample
 {
@@ -35,25 +38,28 @@ namespace ZoomExample
         SvgViewbox dragObj = null;
         Point offset;
        
+
+
         private void CanvasImages_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
 
-            this.dragObj = null;
+            dragObj = null;
             this.canvasss.ReleaseMouseCapture();
            
         }
         private void CanvasImages_PreviewMouseMove(object sender, MouseEventArgs e)
         {
 
-            if (this.dragObj == null)
+            if (dragObj == null)
             {
                 return;
             }
             else
             {
                 var position = e.GetPosition(sender as IInputElement);
-                Canvas.SetTop(this.dragObj, position.Y - this.offset.Y);
-                Canvas.SetLeft(this.dragObj, position.X - this.offset.X);
+               // MessageBox.Show(position.X + " " + position.Y);
+                Canvas.SetTop(dragObj, position.Y - this.offset.Y);
+                Canvas.SetLeft(dragObj, position.X - this.offset.X);
             }
 
             
@@ -75,7 +81,7 @@ namespace ZoomExample
         {
 
             SvgViewbox svg = new SvgViewbox();
-            string path = "D:/Hannan/FlowChartUI/ZoomExample/Resources/magnet.svg";
+            string path = "C:/Users/Bytes-04/Music/FlowChartUI/ZoomExample/Resources/magnet.svg";
             svg.Source = new System.Uri(path);
             svg.AutoSize = true;
             svg.AllowDrop = true;
@@ -85,39 +91,119 @@ namespace ZoomExample
             Canvas.SetLeft(svg, 469);
             // svg.MouseMove += OnMouseMove;
             svg.MouseLeftButtonDown += Img_MouseLeftButtonDown;
+            svg.MouseRightButtonDown += Img_MouseRightButtonDown;
             //svg.PreviewMouseDown += Img_MouseLeftButtonDown;
             svg.AutoSize = true;
+          
 
-            
+
+
             canvasss.Children.Add(svg);
-
+            
 
 
         }
+
+        private void Img_MouseRightButtonDown(object sender, MouseEventArgs e)
+        {
+            SvgViewbox svgLine = sender as SvgViewbox;
+            var position = e.GetPosition(svgLine);
+
+            MessageBox.Show(position.X + " " + position.Y);
+            Path myPath = new Path();
+            myPath.Stroke = System.Windows.Media.Brushes.Black;
+            myPath.Fill = System.Windows.Media.Brushes.MediumSlateBlue;
+            myPath.StrokeThickness = 4;
+            myPath.HorizontalAlignment = HorizontalAlignment.Stretch;
+            myPath.VerticalAlignment = VerticalAlignment.Stretch;
+
+            /*    PathFigure myPathFigure = new PathFigure();
+                myPathFigure.StartPoint = position;
+
+                LineSegment myLineSegment = new LineSegment();
+                myLineSegment.Point = new Point(5, 5);
+
+                PathSegmentCollection myPathSegmentCollection = new PathSegmentCollection();
+                myPathSegmentCollection.Add(myLineSegment);
+
+                myPathFigure.Segments = myPathSegmentCollection;
+
+                PathFigureCollection myPathFigureCollection = new PathFigureCollection();
+                myPathFigureCollection.Add(myPathFigure);*/
+
+            LineGeometry myLineGeometry = new LineGeometry();
+            myLineGeometry.StartPoint = new Point(position.X, position.Y);
+            myLineGeometry.EndPoint = new Point(position.X + 50, position.Y + 50);
+
+
+
+            //  PathGeometry pathGeometry = new PathGeometry();
+            // pathGeometry.Figures = myPathFigureCollection;
+
+
+            myPath.Data = myLineGeometry;
+            
+            Canvas.SetTop(myPath, 220);
+            Canvas.SetLeft(myPath, 469);
+            canvasss.Children.Add(myPath);
+            var pop1 = new Popup();
+            pop1.Child = new TextBox { Text = "Type", Background = Brushes.White };
+            pop1.Placement = PlacementMode.MousePoint;
+            pop1.StaysOpen = false;
+            pop1.Width = 130;
+            pop1.Height = 20;
+            pop1.IsOpen = true;
+            pop1.StaysOpen = true;
+
+        }
+        
         private void Img_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            this.dragObj = sender as SvgViewbox;
+            dragObj = sender as SvgViewbox;
             this.offset = e.GetPosition(this.canvasss);
-            this.offset.Y -= Canvas.GetTop(this.dragObj);
-            this.offset.X -= Canvas.GetLeft(this.dragObj);
+            this.offset.Y -= Canvas.GetTop(dragObj);
+            this.offset.X -= Canvas.GetLeft(dragObj);
             this.canvasss.CaptureMouse();
+            //popup1.IsOpen = true;
+            //popup1.StaysOpen = false;
+            var pop1 = new Popup();
+            pop1.Child = new TextBox { Text = "Type", Background = Brushes.White };
+            pop1.Placement = PlacementMode.MousePoint;
+            pop1.StaysOpen = false;
+            pop1.Width = 130;
+            pop1.Height = 20;
+            pop1.IsOpen = true;
+            pop1.StaysOpen = true;
+           
+
+           
+
+
         }
+        
+
         private void OPEN_Flag(object sender, RoutedEventArgs e)
         {
 
             SvgViewbox svg = new SvgViewbox();
-            string path = "D:/Hannan/FlowChartUI/ZoomExample/Resources/flag.svg";
+            string path = "C:/Users/Bytes-04/Music/FlowChartUI/ZoomExample/Resources/flag.svg";
             svg.Source = new System.Uri(path);
             svg.AutoSize = true;
             svg.AllowDrop = true;
             svg.OptimizePath = false;
             svg.TextAsGeometry = true;
-            svg.MouseMove += OnMouseMove;
-            svg.MouseLeftButtonDown += OnMouseLeftButtonDown;
+            Canvas.SetTop(svg, 220);
+            Canvas.SetLeft(svg, 469);
+            // svg.MouseMove += OnMouseMove;
+            svg.MouseLeftButtonDown += Img_MouseLeftButtonDown;
+            svg.MouseRightButtonDown += Img_MouseRightButtonDown;
+            //svg.PreviewMouseDown += Img_MouseLeftButtonDown;
+            svg.AutoSize = true;
+            
 
             canvasss.Children.Add(svg);
 
- 
+
 
         }
 
@@ -125,17 +211,22 @@ namespace ZoomExample
         {
 
             SvgViewbox svg = new SvgViewbox();
-            string path = "D:/Hannan/FlowChartUI/ZoomExample/Resources/treasure.svg";
+            string path = "C:/Users/Bytes-04/Music/FlowChartUI/ZoomExample/Resources/treasure.svg";
             svg.Source = new System.Uri(path);
             svg.AutoSize = true;
             svg.AllowDrop = true;
             svg.OptimizePath = false;
             svg.TextAsGeometry = true;
-            svg.MouseMove += OnMouseMove;
-            svg.MouseLeftButtonDown += OnMouseLeftButtonDown;
+            Canvas.SetTop(svg, 220);
+            Canvas.SetLeft(svg, 469);
+            // svg.MouseMove += OnMouseMove;
+            svg.MouseLeftButtonDown += Img_MouseLeftButtonDown;
+            svg.MouseRightButtonDown += Img_MouseRightButtonDown;
+            //svg.PreviewMouseDown += Img_MouseLeftButtonDown;
+            svg.AutoSize = true;
+
 
             canvasss.Children.Add(svg);
-
 
 
         }
@@ -144,18 +235,22 @@ namespace ZoomExample
         {
 
             SvgViewbox svg = new SvgViewbox();
-            string path = "D:/Hannan/FlowChartUI/ZoomExample/Resources/treasure.svg";
+            string path = "C:/Users/Bytes-04/Music/FlowChartUI/ZoomExample/Resources/speaker.svg";
             svg.Source = new System.Uri(path);
             svg.AutoSize = true;
             svg.AllowDrop = true;
             svg.OptimizePath = false;
             svg.TextAsGeometry = true;
-            svg.MouseMove += OnMouseMove;
-            svg.MouseLeftButtonDown += OnMouseLeftButtonDown;
+            Canvas.SetTop(svg, 220);
+            Canvas.SetLeft(svg, 469);
+            // svg.MouseMove += OnMouseMove;
+            svg.MouseLeftButtonDown += Img_MouseLeftButtonDown;
+            svg.MouseRightButtonDown += Img_MouseRightButtonDown;
+            //svg.PreviewMouseDown += Img_MouseLeftButtonDown;
+            svg.AutoSize = true;
+
 
             canvasss.Children.Add(svg);
-
-
 
         }
 
@@ -164,17 +259,22 @@ namespace ZoomExample
         {
 
             SvgViewbox svg = new SvgViewbox();
-            string path = "D:/Hannan/FlowChartUI/ZoomExample/Resources/treasure.svg";
+            string path = "C:/Users/Bytes-04/Music/FlowChartUI/ZoomExample/Resources/backtrack.svg";
             svg.Source = new System.Uri(path);
             svg.AutoSize = true;
             svg.AllowDrop = true;
             svg.OptimizePath = false;
             svg.TextAsGeometry = true;
-            svg.MouseMove += OnMouseMove;
-            svg.MouseLeftButtonDown += OnMouseLeftButtonDown;
+            Canvas.SetTop(svg, 220);
+            Canvas.SetLeft(svg, 469);
+            // svg.MouseMove += OnMouseMove;
+            svg.MouseLeftButtonDown += Img_MouseLeftButtonDown;
+            svg.MouseRightButtonDown += Img_MouseRightButtonDown;
+            //svg.PreviewMouseDown += Img_MouseLeftButtonDown;
+            svg.AutoSize = true;
+
 
             canvasss.Children.Add(svg);
-
 
 
         }
@@ -183,18 +283,22 @@ namespace ZoomExample
         {
 
             SvgViewbox svg = new SvgViewbox();
-            string path = "D:/Hannan/FlowChartUI/ZoomExample/Resources/treasure.svg";
+            string path = "C:/Users/Bytes-04/Music/FlowChartUI/ZoomExample/Resources/output.svg";
             svg.Source = new System.Uri(path);
             svg.AutoSize = true;
             svg.AllowDrop = true;
             svg.OptimizePath = false;
             svg.TextAsGeometry = true;
-            svg.MouseMove += OnMouseMove;
-            svg.MouseLeftButtonDown += OnMouseLeftButtonDown;
+            Canvas.SetTop(svg, 220);
+            Canvas.SetLeft(svg, 469);
+            // svg.MouseMove += OnMouseMove;
+            svg.MouseLeftButtonDown += Img_MouseLeftButtonDown;
+            svg.MouseRightButtonDown += Img_MouseRightButtonDown;
+            //svg.PreviewMouseDown += Img_MouseLeftButtonDown;
+            svg.AutoSize = true;
+
 
             canvasss.Children.Add(svg);
-
-
 
         }
 
@@ -202,17 +306,22 @@ namespace ZoomExample
         {
 
             SvgViewbox svg = new SvgViewbox();
-            string path = "D:/Hannan/FlowChartUI/ZoomExample/Resources/treasure.svg";
+            string path = "C:/Users/Bytes-04/Music/FlowChartUI/ZoomExample/Resources/homophone.svg";
             svg.Source = new System.Uri(path);
             svg.AutoSize = true;
             svg.AllowDrop = true;
             svg.OptimizePath = false;
             svg.TextAsGeometry = true;
-            svg.MouseMove += OnMouseMove;
-            svg.MouseLeftButtonDown += OnMouseLeftButtonDown;
+            Canvas.SetTop(svg, 220);
+            Canvas.SetLeft(svg, 469);
+            // svg.MouseMove += OnMouseMove;
+            svg.MouseLeftButtonDown += Img_MouseLeftButtonDown;
+            svg.MouseRightButtonDown += Img_MouseRightButtonDown;
+            //svg.PreviewMouseDown += Img_MouseLeftButtonDown;
+            svg.AutoSize = true;
+
 
             canvasss.Children.Add(svg);
-
 
 
         }
@@ -221,14 +330,20 @@ namespace ZoomExample
         {
 
             SvgViewbox svg = new SvgViewbox();
-            string path = "D:/Hannan/FlowChartUI/ZoomExample/Resources/treasure.svg";
+            string path = "C:/Users/Bytes-04/Music/FlowChartUI/ZoomExample/Resources/bucket.svg";
             svg.Source = new System.Uri(path);
             svg.AutoSize = true;
             svg.AllowDrop = true;
             svg.OptimizePath = false;
             svg.TextAsGeometry = true;
-            svg.MouseMove += OnMouseMove;
-            svg.MouseLeftButtonDown += OnMouseLeftButtonDown;
+            Canvas.SetTop(svg, 220);
+            Canvas.SetLeft(svg, 469);
+            // svg.MouseMove += OnMouseMove;
+            svg.MouseLeftButtonDown += Img_MouseLeftButtonDown;
+            svg.MouseRightButtonDown += Img_MouseRightButtonDown;
+            //svg.PreviewMouseDown += Img_MouseLeftButtonDown;
+            svg.AutoSize = true;
+
 
             canvasss.Children.Add(svg);
 
@@ -240,17 +355,22 @@ namespace ZoomExample
         {
 
             SvgViewbox svg = new SvgViewbox();
-            string path = "D:/Hannan/FlowChartUI/ZoomExample/Resources/treasure.svg";
+            string path = "C:/Users/Bytes-04/Music/FlowChartUI/ZoomExample/Resources/scale.svg";
             svg.Source = new System.Uri(path);
             svg.AutoSize = true;
             svg.AllowDrop = true;
             svg.OptimizePath = false;
             svg.TextAsGeometry = true;
-            svg.MouseMove += OnMouseMove;
-            svg.MouseLeftButtonDown += OnMouseLeftButtonDown;
+            Canvas.SetTop(svg, 220);
+            Canvas.SetLeft(svg, 469);
+            // svg.MouseMove += OnMouseMove;
+            svg.MouseLeftButtonDown += Img_MouseLeftButtonDown;
+            svg.MouseRightButtonDown += Img_MouseRightButtonDown;
+            //svg.PreviewMouseDown += Img_MouseLeftButtonDown;
+            svg.AutoSize = true;
+
 
             canvasss.Children.Add(svg);
-
 
 
         }
@@ -258,7 +378,7 @@ namespace ZoomExample
 
         void OnMouseMove(object sender, MouseEventArgs e)
         {
-            /*if (lastDragPoint.HasValue)
+           /* if (lastDragPoint.HasValue)
             {
                 Point posNow = e.GetPosition(scrollViewer);
 
@@ -274,7 +394,7 @@ namespace ZoomExample
 
         void OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-        /*    var mousePos = e.GetPosition(scrollViewer);
+          /*  var mousePos = e.GetPosition(scrollViewer);
             if (mousePos.X <= scrollViewer.ViewportWidth && mousePos.Y < scrollViewer.ViewportHeight) //make sure we still can use the scrollbars
             {
                 scrollViewer.Cursor = Cursors.SizeAll;
